@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/guistrutzki/youtube-robots/issues"
   },
-  "homepage": "https://github.com/guistrutzki/youtube-robots#readme"
+  "homepage": "https://github.com/guistrutzki/youtube-robots#readme",
+  "dependencies": {
+    "readline-sync": "^1.4.9"
+  }
 }
