@@ -1,10 +1,11 @@
 const algorithmia = require('algorithmia');
 const algorithmiaApiKey = require('../credentials/algorithmia.json').apiKey;
+const sentenceBoundaryDetection = require('sbd');
 
 async function robot(content) {
   await fetchContentFromWikipedia(content);
   sanitizeContent(content);
-  // breakContentIntoSentences(content);
+  breakContentIntoSentences(content);
 
   async function fetchContentFromWikipedia(content) {
     const algorithmiaAuthenticated = algorithmia(algorithmiaApiKey);
@@ -19,7 +20,8 @@ async function robot(content) {
     const withoutBlankLinesAndMarkdown = removeBlankLinesAndMarkdown(content.sourceContentOriginal);
     const withoutDatesInParentheses = removeDatesInParentheses(withoutBlankLinesAndMarkdown);
 
-    console.log(withoutDatesInParentheses);
+    content.sourceContentSanitized = withoutDatesInParentheses;
+    // console.log(content.sourceContentSanitized);
 
     function removeBlankLinesAndMarkdown(text) {
       const allLines = text.split('\n');
@@ -35,10 +37,23 @@ async function robot(content) {
     }
 
     function removeDatesInParentheses(text) {
-      return text.replace(/\)
-
-      // 20:08 stopped
+      return text.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '').replace(/  /g,' ');
     }
+  }
+
+  function breakContentIntoSentences (content) {
+    content.sentences = [];
+
+    const sentences = sentenceBoundaryDetection.sentences(content.sourceContentSanitized);
+    sentences.forEach( sentence => {
+      content.sentences.push({
+        text: sentence,
+        keywords: [],
+        images: []
+      });
+    })
+
+    console.log(content.sentences);
   }
 }
 
